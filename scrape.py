@@ -36,7 +36,7 @@ def get_tz_offset(airport_code):
 
 def departure_time_for_row(tr):
     tds = tr.findAll('td')
-    if len(tds) < 6 or tds[6].text.strip() == '-':
+    if len(tds) < 6 or tds[6].text.strip() in ['-', u'\u2014']:
         return None
     year_month_day = tds[1].text.strip()
     time_depart = tds[6].text.strip()

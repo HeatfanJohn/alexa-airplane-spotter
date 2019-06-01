@@ -1,0 +1,11 @@
+[Unit]
+Description=Amazon Alex Airplane Spotter Skill Web Service
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/alexa-airplane-spotter
+ExecStart=/usr/bin/node server.js
+
+[Install]
+WantedBy=multi-user.target
