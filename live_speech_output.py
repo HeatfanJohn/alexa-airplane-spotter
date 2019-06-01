@@ -8,17 +8,22 @@ NO_NEARBY_OUTPUT_SPEECH = "Sorry, I'm not seeing any nearby planes at the moment
 
 def speech_output(plane_data):
     logger.info('getting speech output for {}'.format(plane_data))
-    output = "That's {airline_article} {airline} {aircraft}"
+    output = "That's {airline_article} {airline} {aircraft} flying at {altitude} feet traveling {velocity} miles per hour"
     route_output = " going from {depart_airport} to {arrival_airport}"
 
     from_airport = plane_data.get('airport_depart', None)
     to_airport = plane_data.get('airport_arrive', None)
 
     airline = plane_data.get('airline', 'unknown airline')
-    airline_article = 'an' if airline[0] in 'aieou' else 'a'
+    airline_article = 'an' if airline[0].lower() in 'aieo' else 'a'
     aircraft = plane_data['aircraft']
+    altitude = plane_data.get('altitude', 'unknown')
+    velocity = plane_data.get('velocity', 'unknown')
+    velocity = int(round(velocity * 1.15078))
 
-    formatted_output = output.format(airline_article=airline_article, airline=airline, aircraft=aircraft)
+    formatted_output = output.format(airline_article=airline_article, airline=airline, aircraft=aircraft,
+        altitude=altitude, velocity=velocity)
+
     if not from_airport or not to_airport:
         return formatted_output
     else:

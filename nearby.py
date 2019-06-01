@@ -146,17 +146,19 @@ class RtlScanner(Scanner):
 
 
     def _valid_data(self, data_pt):
-        if data_pt.get('seen', 1000) > 35: # 'seen' == seconds since last msg
-            return False # stale messages == out of sight (ideally)
-        if len(data_pt.get('hex', '').strip()) == 0:
-            return False # invalid hex code
-        return True
+        if all (k in data_pt for k in ('seen', 'hex', 'flight', 'lon', 'lat', 'altitude', 'speed', 'vert_rate')):
+            if data_pt.get('seen', 1000) > 35: # 'seen' == seconds since last msg
+               return False # stale messages == out of sight (ideally)
+            if len(data_pt.get('hex', '').strip()) == 0:
+               return False # invalid hex code
+            return True
+        return False
 
 
     def nearby(self):
         res = requests.get(self.ENDPOINT) # localhost:8080/data.json
         data = json.loads(res.text)
-        data = filter(self._valid_data, data)
+        data = filter(self._valid_data, data['aircraft'])
         return [self._as_state_vector(v) for v in data]
 
 

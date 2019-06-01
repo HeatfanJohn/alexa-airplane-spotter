@@ -58,8 +58,21 @@ def most_recent_departure(soup):
 def scrape_route_data(reg_no):
     url = route_data_endpoint.format(reg_no) #flightradar24.com/data/aircraft/{}
     logger.info("url={}".format(url))
-    res = requests.get(url) #
+    
+    # Get a copy of the default headers that requests would use
+    headers = requests.utils.default_headers()
+
+    headers.update(
+        {
+#           'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537 .36'
+            'User-Agent': 'curl/7.38.0'
+        }
+    )
+
+    res = requests.get(url, headers=headers)
     route_row = most_recent_departure(BeautifulSoup(res.text, "lxml"))
+    if route_row is None:
+        return None, None
 
     depart = route_row.findAll('td')[2].find('span').text
     depart = re.sub('[A-Z]{3}', '', depart).strip()
@@ -91,14 +104,24 @@ def flight_info(flight):
 
     if not results:
         logger.info('could find flight in db (flight={})'.format(flight))
-        return None
+        data = {
+                'aircraft': None,
+                'airline': 'Unknown ICAO',
+                'altitude': flight.altitude,
+                'velocity': flight.velocity,
+                'airport_depart': None,
+                'airport_arrive': None
+        }
+        return data
 
     reg_no, aircraft, airline = results
     aircraft = ''.join(aircraft.split('-')[:-1])
 
     data = {
             'aircraft': aircraft,
-            'airline': airline
+            'airline': airline,
+            'altitude': flight.altitude,
+            'velocity': flight.velocity
     }
 
     if not reg_no:
