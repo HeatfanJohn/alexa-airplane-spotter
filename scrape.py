@@ -36,11 +36,11 @@ def get_tz_offset(airport_code):
 
 def departure_time_for_row(tr):
     tds = tr.findAll('td')
-    if len(tds) < 6 or tds[6].text.strip() in ['-', u'\u2014']:
+    if len(tds) < 6 or (tds[6].text.strip() in ['-', u'\u2014']):
         return None
-    year_month_day = tds[1].text.strip()
+    year_month_day = tds[2].text.strip()
     time_depart = tds[6].text.strip()
-    localtime = datetime.datetime.strptime('{} {}'.format(year_month_day, time_depart), '%Y-%m-%d %H:%M')
+    localtime = datetime.datetime.strptime('{} {}'.format(year_month_day, time_depart), '%d %b %Y %H:%M')
     departure_airport = get_departure_airport(tr)
     return localtime - datetime.timedelta(hours=get_tz_offset(departure_airport))
 
@@ -74,10 +74,10 @@ def scrape_route_data(reg_no):
     if route_row is None:
         return None, None
 
-    depart = route_row.findAll('td')[2].find('span').text
-    depart = re.sub('[A-Z]{3}', '', depart).strip()
-    arrive = route_row.findAll('td')[3].find('span').text
-    arrive = re.sub('[A-Z]{3}', '', arrive).strip()
+    depart = route_row.findAll('td')[3].text
+    depart = re.sub('\([A-Z]{3}\)', '', depart).strip()
+    arrive = route_row.findAll('td')[4].text
+    arrive = re.sub('\([A-Z]{3}\)', '', arrive).strip()
 
     return depart, arrive
 
