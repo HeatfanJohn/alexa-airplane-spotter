@@ -106,7 +106,7 @@ def flight_info(flight):
         logger.info('could find flight in db (flight={})'.format(flight))
         data = {
                 'aircraft': None,
-                'airline': 'Unknown ICAO',
+                'airline': 'Unknown ICAO ' + flight.icao24,
                 'altitude': flight.altitude,
                 'velocity': flight.velocity,
                 'airport_depart': None,
