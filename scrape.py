@@ -52,6 +52,9 @@ def std_in_past(row):
 
 def most_recent_departure(soup):
     trs = soup.findAll('tr')[1:] # first tr in html isn't a flight row
+
+#   Iterate through all the rows returned by FlightRadar24 and return the 1st with a departure in the past
+
     return next((tr for tr in trs if std_in_past(tr) and tr is not None), None)
 
 
