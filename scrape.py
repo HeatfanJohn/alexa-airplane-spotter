@@ -20,7 +20,7 @@ with open('icao_codes.tsv', 'r') as f:
 
 
 def get_departure_airport(row):
-    airport = row.findAll('td')[2].find('span').text
+    airport = row.findAll('td')[3].text
     airport_code = re.search('[A-Z]{3}', airport).group(0)
     return airport_code
 
@@ -36,10 +36,14 @@ def get_tz_offset(airport_code):
 
 def departure_time_for_row(tr):
     tds = tr.findAll('td')
-    if len(tds) < 6 or (tds[6].text.strip() in ['-', u'\u2014']):
+    logger.info(len(tds))
+    logger.info(tds[7].text.strip())
+    if len(tds) < 7 or (tds[7].text.strip() in ['-', u'\u2014']):
         return None
     year_month_day = tds[2].text.strip()
-    time_depart = tds[6].text.strip()
+    logger.info(year_month_day)
+    time_depart = tds[7].text.strip()
+    logger.info(time_depart)
     localtime = datetime.datetime.strptime('{} {}'.format(year_month_day, time_depart), '%d %b %Y %H:%M')
     departure_airport = get_departure_airport(tr)
     return localtime - datetime.timedelta(hours=get_tz_offset(departure_airport))
@@ -47,6 +51,8 @@ def departure_time_for_row(tr):
 
 def std_in_past(row):
     std = departure_time_for_row(row)
+    logger.info(std)
+    logger.info(datetime.datetime.now())
     return std is None or std < datetime.datetime.now()
 
 
