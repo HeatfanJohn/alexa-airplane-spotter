@@ -6,3 +6,4 @@ node_modules/
 lambda/lambda_settings.py
 .cache/
 *.log
+*.swp
